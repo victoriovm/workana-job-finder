@@ -43,13 +43,13 @@ if ($config["ignore-finded"] && file_exists(__DIR__ . "/jobs.json")) {
 echo PHP_EOL;
 
 for ($page = 0; $page < $config["pages"]; $page++) {
-	$finded = fetch($page, $config["category"]);
+	$results = fetch($page, $config["category"]);
 
-	if (count($finded) === 0) {
+	if (count($results) === 0) {
 		break;
 	}
 
-	foreach ($finded as $job) {
+	foreach ($results as $job) {
 		$bids = (int) str_replace("Propostas: ", "", $job["totalBids"]);
 
 		if ($bids <= $config["max-bids"]) {
@@ -62,7 +62,7 @@ for ($page = 0; $page < $config["pages"]; $page++) {
 
 			$index = $title . $description;
 
-			if (!in_array($index, $jobs, true) && ($config["ignore-finded"] && in_array($index, $finded, true))) {
+			if (!in_array($index, $jobs, true) && (!$config["ignore-finded"] || !in_array($index, $finded, true))) {
 				$jobs[] = $index;
 				$finded[] = $index;
 
