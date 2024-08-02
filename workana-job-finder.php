@@ -47,8 +47,12 @@ for ($page = 0; $page < $config["pages"]; $page++) {
 		$bids = (int) str_replace("Propostas: ", "", $job["totalBids"]);
 
 		if ($bids <= $config["max-bids"]) {
-			$title = strip_tags($job["title"]);
+			$title = strip_tags($rawTitle = $job["title"]);
 			$description = html_entity_decode(strip_tags($job["description"]), ENT_QUOTES | ENT_HTML5, "UTF-8");
+
+			$rawLink = explode("<a href=\"", $rawTitle)[1];
+			$rawLink = explode("\"", $rawLink)[0];
+			$link = "https://www.workana.com" . $rawLink;
 
 			$index = $title . $description;
 
@@ -59,7 +63,7 @@ for ($page = 0; $page < $config["pages"]; $page++) {
 				echo "---------------------------------------------------------" . PHP_EOL;
 				echo "Título: " . COLOR_YELLOW . $title . PHP_EOL . COLOR_RESET;
 				echo "Descrição: " . COLOR_YELLOW . substr($description, 0, $config["description-length"]) . "..." . PHP_EOL . COLOR_RESET;
-				echo "Link: " . COLOR_YELLOW . $job["dismissInvitationUrl"] . PHP_EOL . COLOR_RESET;
+				echo "Link: " . COLOR_YELLOW . $link . PHP_EOL . COLOR_RESET;
 				echo "Postado: " . COLOR_YELLOW . $job["postedDate"] . PHP_EOL . COLOR_RESET;
 				echo "---------------------------------------------------------" . PHP_EOL;
 				echo PHP_EOL;
