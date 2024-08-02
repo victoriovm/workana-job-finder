@@ -29,8 +29,8 @@ function fetch(int $page, string $category): array {
 		throw new ErrorException(curl_error($ch));
 	}
 	curl_close($ch);
-
-	return json_decode($result, true)["results"]["results"];
+	$result = (array) json_decode($result, true);
+	return $result["results"]["results"] ?? [];
 }
 
 $jobs = [];
@@ -43,7 +43,13 @@ if ($config["ignore-finded"] && file_exists(__DIR__ . "/jobs.json")) {
 echo PHP_EOL;
 
 for ($page = 0; $page < $config["pages"]; $page++) {
-	foreach (fetch($page, $config["category"]) as $job) {
+	$finded = fetch($page, $config["category"]);
+
+	if (count($finded) === 0) {
+		break;
+	}
+
+	foreach ($finded as $job) {
 		$bids = (int) str_replace("Propostas: ", "", $job["totalBids"]);
 
 		if ($bids <= $config["max-bids"]) {
@@ -56,7 +62,7 @@ for ($page = 0; $page < $config["pages"]; $page++) {
 
 			$index = $title . $description;
 
-			if (!in_array($index, $jobs, true) && (!$config["ignore-finded"] || !in_array($index, $finded, true))) {
+			if (!in_array($index, $jobs, true) && ($config["ignore-finded"] && in_array($index, $finded, true))) {
 				$jobs[] = $index;
 				$finded[] = $index;
 
